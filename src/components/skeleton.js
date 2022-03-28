@@ -40,11 +40,14 @@ export default function Skeleton() {
   async function fetchWeather() {
     console.log(lat, long);
     await weatherData(long, lat).then((e) => {
-      let hourlyTemps = e.hourly.data.map((e) => e.temperature);
-      setTmp(Math.round(e.currently.temperature));
+      console.log(e);
+      //   let hourlyTemps = e.hourly.data.map((e) => e.temperature )|| e.hourly.map((e) => e.temp );
+      let hourlyTemps = e.hourly.map((e) => e.temp);
+      //   setTmp(Math.round(e.currently.temperature || e.current.temp));
+      setTmp(Math.round(e.current.temp));
       setTmpHigh(Math.round(Math.max(...hourlyTemps)));
       setTmpLow(Math.round(Math.min(...hourlyTemps)));
-      setComment(e.currently.summery);
+      setComment(e.currently.summery || "comment placeholder");
       setcity(e.timezone);
       setDate(dateFunc(e.currently.time * 1000));
     });

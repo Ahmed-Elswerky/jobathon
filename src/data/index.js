@@ -13,7 +13,8 @@ function showPosition(position) {
 
 export async function weatherData(long, lat) {
   return await fetch(
-    `https://api.darksky.net/forecast/a177f8481c31fa96c3f95ad4f4f84610/${lat},${long}`,
+    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&appid=3c9decd67637537731578a01aee56710`,
+    // `https://api.darksky.net/forecast/a177f8481c31fa96c3f95ad4f4f84610/${lat},${long}`,
     {
       method: "GET",
     }
