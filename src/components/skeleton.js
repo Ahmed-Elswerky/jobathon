@@ -9,8 +9,8 @@ export default function Skeleton() {
   const [tmpHigh, setTmpHigh] = useState(0);
   const [tmpLow, setTmpLow] = useState(0);
   const [comment, setComment] = useState("");
-  const [long, setLong] = useState(0);
-  const [lat, setLat] = useState(0);
+  const [long, setLong] = useState(-71);
+  const [lat, setLat] = useState(20);
   const [city, setcity] = useState("city placeholder");
   const [date, setDate] = useState(0);
   //   console.log(weatherData());
@@ -27,29 +27,62 @@ export default function Skeleton() {
     // return { long: position.coords.longitude, lat: position.coords.latitude }
     setLong(position.coords.longitude);
     setLat(position.coords.latitude);
+    return;
   }
 
   async function weatherData() {
     console.log(lat, long);
-    let res = await fetch(
+    console.log(
+      `https://api.darksky.net/forecast/a177f8481c31fa96c3f95ad4f4f84610/${lat},${long}`
+    );
+    let res = fetch(
+      // `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&appid=3c9decd67637537731578a01aee56710`,
       `https://api.darksky.net/forecast/a177f8481c31fa96c3f95ad4f4f84610/${lat},${long}`,
       {
         method: "GET",
-        mode: "no-cors",
-        headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin':'no-cors'
-        }
+        // mode: "no-cors",
+        // headers: {
+        // 'Content-Type': 'application/json',
+        // 'Access-Control-Allow-Origin':'no-cors'
+        // }
       }
     )
-    console.log(typeof res,res.body, "-------------------");
+      .then((res) => res.json())
+      .then((e) => {
+        console.log(e, e.Response);
+        // setTmp(e.currently.apparentTemperature)
+        let hourlyTemps = e.hourly.data.map((e) => e.temperature);
+        console.log(Math.max(...hourlyTemps));
+        setTmp(Math.round(e.currently.temperature));
+        setTmpHigh(Math.round(Math.max(...hourlyTemps)));
+        setTmpLow(Math.round(Math.min(...hourlyTemps)));
+        setComment(e.currently.summery);
+        setcity(e.timezone);
+      });
+    // console.log( res,res.body, "-------------------");
   }
   useEffect(() => {
     dateFunc();
+    getLocation();
   }, []);
   useEffect(() => {
     weatherData();
   }, [lat, long]);
+  useEffect(() => {
+    if (tempType == "f") {
+      setTmp(celsiusToFahrenheit(tmp));
+      setTmpHigh(celsiusToFahrenheit(tmpHigh));
+      setTmpLow(celsiusToFahrenheit(tmpLow));
+    } else if (tempType == "c") {
+      setTmp(fahrenheitToCelsius(tmp));
+      setTmpHigh(fahrenheitToCelsius(tmpHigh));
+      setTmpLow(fahrenheitToCelsius(tmpLow));
+    }
+  }, [tempType]);
+  const celsiusToFahrenheit = (celsius) => Math.round((celsius * 9) / 5 + 32);
+
+  const fahrenheitToCelsius = (fahrenheit) =>
+    Math.round(((fahrenheit - 32) * 5) / 9);
   function dateFunc() {
     const monthNames = [
       "January",
@@ -72,7 +105,7 @@ export default function Skeleton() {
     let month = date.getMonth() + 1;
     setDate(
       monthNames[d.getMonth()] + " " + d.getDate() + " " + d.getFullYear()
-    )
+    );
     setInterval(
       () =>
         setDate(
@@ -93,8 +126,22 @@ export default function Skeleton() {
         <div className="col">INSTAWEATHER</div>
         <div className="col">
           <div className="row">
-            <div className={"col" +( tempType == "c" ? " active bg-secondary":'')} onClick={()=>setTempType('c')}>C</div>
-            <div className={"col" +( tempType == "f" ? " active bg-secondary":'')} onClick={()=>setTempType('f')}>F</div>
+            <div
+              className={
+                "col" + (tempType == "c" ? " active bg-secondary" : "")
+              }
+              onClick={() => setTempType("c")}
+            >
+              C
+            </div>
+            <div
+              className={
+                "col" + (tempType == "f" ? " active bg-secondary" : "")
+              }
+              onClick={() => setTempType("f")}
+            >
+              F
+            </div>
           </div>
         </div>
       </div>
