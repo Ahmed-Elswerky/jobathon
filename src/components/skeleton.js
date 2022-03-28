@@ -43,7 +43,6 @@ export default function Skeleton() {
   const [hourly, setHourly] = useState([]);
   const [daily, setDaily] = useState([]);
   const [listType, setListType] = useState("hourly");
-  //   console.log(weatherData());
   function getLocation() {
     if (navigator.geolocation) {
       return navigator.geolocation.getCurrentPosition(
@@ -61,7 +60,6 @@ export default function Skeleton() {
 
   function showPosition(position) {
     console.log(position);
-    // return { long: position.coords.longitude, lat: position.coords.latitude }
     setLong(position.coords.longitude);
     setLat(position.coords.latitude);
     return;
@@ -71,9 +69,7 @@ export default function Skeleton() {
     console.log(lat, long);
     await weatherData(long, lat).then((e) => {
       console.log(e);
-      //   let hourlyTemps = e.hourly.data.map((e) => e.temperature )|| e.hourly.map((e) => e.temp );
       let hourlyTemps = e.hourly.map((e) => e.temp);
-      //   setTmp(Math.round(e.currently.temperature || e.current.temp));
       setTmp(Math.round(e.current.temp));
       setTmpHigh(Math.round(Math.max(...hourlyTemps)));
       setTmpLow(Math.round(Math.min(...hourlyTemps)));
@@ -190,7 +186,6 @@ export default function Skeleton() {
           </div>
         </div>
       </div>
-      <div className="row"></div>
     </div>
   );
 }
