@@ -73,7 +73,11 @@ export default function Skeleton() {
       setTmp(Math.round(e.current.temp));
       setTmpHigh(Math.round(Math.max(...hourlyTemps)));
       setTmpLow(Math.round(Math.min(...hourlyTemps)));
-      setComment("no weather summery in the used api");
+      setComment(
+        e.current?.weather[0] != undefined
+          ? e.current?.weather[0].description
+          : "no weather summery in the used api"
+      );
       setcity(e.timezone);
       setDate(dateFunc(e.current.dt * 1000));
       let hourlyData = e.hourly.map((e) => {
@@ -155,18 +159,18 @@ export default function Skeleton() {
       </div>
       <div className="row">
         <div className="col">
-          <h1>{city}</h1>
-          <div>{date}</div>
-          <img src={wIcon} style={{ width: "50px" }} alt="" />
+          <h1 className=" py-2">{city}</h1>
+          <div className=" py-2">{date}</div>
+          <img className=" py-2" src={wIcon} style={{ width: "50px" }} alt="" />
         </div>
         <div className="col">
-          <h1>{tmp}</h1>
-          <div className="row w-50 m-auto">
+          <h1 className=" py-2">{tmp}</h1>
+          <div className="row w-50 m-auto  py-2">
             <div className="col">{tmpHigh}</div>
             <div className="col">/</div>
             <div className="col">{tmpLow}</div>
           </div>
-          <div>{comment}</div>
+          <div className=" py-2">{comment}</div>
         </div>
       </div>
       <div>
