@@ -3,6 +3,33 @@ import { weatherData, locationData } from "../data";
 import bkg from "../assets/background.png";
 import wIcon from "../assets/weather-icon.png";
 
+function Item({ time, temp }) {
+  return (
+    <div className="d-inline-block m-2" style={{ minWidth: "100px" }}>
+      <div className="card bg-transparent">
+        <div className="card-body">
+          <div className="col">{time}</div>
+          <div className="col">
+            <img src={wIcon} style={{ width: "50px" }} alt="" />
+          </div>
+          <div className="col">{temp}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ListItems({ data }) {
+  console.log(data);
+  return (
+    <div className="w-auto d-flex flex-row overflow-auto p-5">
+      {data.map((item, index) => (
+        <Item temp={item.temp} time={item.time} />
+      ))}
+    </div>
+  );
+}
+
 export default function Skeleton() {
   const [tempType, setTempType] = useState("f");
   const [tmp, setTmp] = useState(0);
@@ -13,6 +40,9 @@ export default function Skeleton() {
   const [lat, setLat] = useState(20);
   const [city, setcity] = useState("city placeholder");
   const [date, setDate] = useState(0);
+  const [hourly, setHourly] = useState([]);
+  const [daily, setDaily] = useState([]);
+  const [listType, setListType] = useState("hourly");
   //   console.log(weatherData());
   function getLocation() {
     if (navigator.geolocation) {
@@ -47,9 +77,22 @@ export default function Skeleton() {
       setTmp(Math.round(e.current.temp));
       setTmpHigh(Math.round(Math.max(...hourlyTemps)));
       setTmpLow(Math.round(Math.min(...hourlyTemps)));
-      setComment(e.currently.summery || "comment placeholder");
+      setComment("no weather summery in the used api");
       setcity(e.timezone);
-      setDate(dateFunc(e.currently.time * 1000));
+      setDate(dateFunc(e.current.dt * 1000));
+      let hourlyData = e.hourly.map((e) => {
+        let date1 = new Date(e.dt * 1000);
+        let time = date1.getHours() + ":" + date1.getMinutes();
+        return { temp: e.temp, time };
+      });
+      setHourly(hourlyData);
+      let dailyData = e.daily.map((e) => {
+        let time = new Date(e.dt * 1000);
+        time = dateFunc(time);
+        return { temp: e.temp.day, time };
+      });
+      setDaily(dailyData);
+      console.log(hourlyData, dailyData);
     });
   }
 
@@ -122,13 +165,31 @@ export default function Skeleton() {
           <div>{comment}</div>
         </div>
       </div>
-      {/* <div>
+      <div>
         <div className="row">
-          <div>Hourly</div>
-          <div>Daily</div>
+          <div
+            className={
+              "col" + (listType == "hourly" ? " active bg-secondary" : "")
+            }
+            onClick={() => setListType("hourly")}
+          >
+            Hourly
+          </div>
+          <div
+            className={
+              "col" + (listType == "daily" ? " active bg-secondary" : "")
+            }
+            onClick={() => setListType("daily")}
+          >
+            Daily
+          </div>
         </div>
-        <div className="row">data....</div>
-      </div> */}
+        <div className="row">
+          <div>
+            <ListItems data={listType == "hourly" ? hourly : daily} />
+          </div>
+        </div>
+      </div>
       <div className="row"></div>
     </div>
   );
