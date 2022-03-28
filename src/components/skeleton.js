@@ -106,10 +106,18 @@ export default function Skeleton() {
       setTmp(celsiusToFahrenheit(tmp));
       setTmpHigh(celsiusToFahrenheit(tmpHigh));
       setTmpLow(celsiusToFahrenheit(tmpLow));
+      setDaily(daily.map((e) => ({ ...e, temp: celsiusToFahrenheit(e.temp) })));
+      setHourly(
+        hourly.map((e) => ({ ...e, temp: celsiusToFahrenheit(e.temp) }))
+      );
     } else if (tempType == "c") {
       setTmp(fahrenheitToCelsius(tmp));
       setTmpHigh(fahrenheitToCelsius(tmpHigh));
       setTmpLow(fahrenheitToCelsius(tmpLow));
+      setDaily(daily.map((e) => ({ ...e, temp: fahrenheitToCelsius(e.temp) })));
+      setHourly(
+        hourly.map((e) => ({ ...e, temp: fahrenheitToCelsius(e.temp) }))
+      );
     }
   }, [tempType]);
 
