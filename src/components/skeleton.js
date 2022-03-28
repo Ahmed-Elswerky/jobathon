@@ -16,7 +16,14 @@ export default function Skeleton() {
   //   console.log(weatherData());
   function getLocation() {
     if (navigator.geolocation) {
-      return navigator.geolocation.getCurrentPosition(showPosition);
+      return navigator.geolocation.getCurrentPosition(
+        (e) => {
+          showPosition(e);
+          console.log(e);
+        },
+        (e) => console.log(e),
+        { timeout: 10000, enableHighAccuracy: false }
+      );
     } else {
       return "navigator geolocation is not supported by this browser.";
     }
@@ -30,44 +37,28 @@ export default function Skeleton() {
     return;
   }
 
-  async function weatherData() {
+  async function fetchWeather() {
     console.log(lat, long);
-    console.log(
-      `https://api.darksky.net/forecast/a177f8481c31fa96c3f95ad4f4f84610/${lat},${long}`
-    );
-    let res = fetch(
-      // `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&appid=3c9decd67637537731578a01aee56710`,
-      `https://api.darksky.net/forecast/a177f8481c31fa96c3f95ad4f4f84610/${lat},${long}`,
-      {
-        method: "GET",
-        // mode: "no-cors",
-        // headers: {
-        // 'Content-Type': 'application/json',
-        // 'Access-Control-Allow-Origin':'no-cors'
-        // }
-      }
-    )
-      .then((res) => res.json())
-      .then((e) => {
-        console.log(e, e.Response);
-        // setTmp(e.currently.apparentTemperature)
-        let hourlyTemps = e.hourly.data.map((e) => e.temperature);
-        console.log(Math.max(...hourlyTemps));
-        setTmp(Math.round(e.currently.temperature));
-        setTmpHigh(Math.round(Math.max(...hourlyTemps)));
-        setTmpLow(Math.round(Math.min(...hourlyTemps)));
-        setComment(e.currently.summery);
-        setcity(e.timezone);
-      });
-    // console.log( res,res.body, "-------------------");
+    await weatherData(long, lat).then((e) => {
+      let hourlyTemps = e.hourly.data.map((e) => e.temperature);
+      setTmp(Math.round(e.currently.temperature));
+      setTmpHigh(Math.round(Math.max(...hourlyTemps)));
+      setTmpLow(Math.round(Math.min(...hourlyTemps)));
+      setComment(e.currently.summery);
+      setcity(e.timezone);
+      setDate(dateFunc(e.currently.time * 1000));
+    });
   }
+
   useEffect(() => {
     dateFunc();
     getLocation();
   }, []);
+
   useEffect(() => {
-    weatherData();
+    fetchWeather();
   }, [lat, long]);
+
   useEffect(() => {
     if (tempType == "f") {
       setTmp(celsiusToFahrenheit(tmp));
@@ -79,53 +70,20 @@ export default function Skeleton() {
       setTmpLow(fahrenheitToCelsius(tmpLow));
     }
   }, [tempType]);
-  const celsiusToFahrenheit = (celsius) => Math.round((celsius * 9) / 5 + 32);
 
-  const fahrenheitToCelsius = (fahrenheit) =>
-    Math.round(((fahrenheit - 32) * 5) / 9);
-  function dateFunc() {
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const d = new Date();
-    let date = new Date();
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    setDate(
-      monthNames[d.getMonth()] + " " + d.getDate() + " " + d.getFullYear()
-    );
-    setInterval(
-      () =>
-        setDate(
-          monthNames[d.getMonth()] + " " + d.getDate() + " " + d.getFullYear()
-        ),
-      1000 * 60 * 60 * 24
-    );
-  }
   return (
     <div
-      className="row"
+      className="container d-flex flex-column justify-content-around"
       style={{
         background: `url(${bkg}) center center / cover no-repeat`,
-        height: "100vh",
+        minHeight: "100vh",
+        maxWidth: "100vw",
       }}
     >
       <div className="row">
-        <div className="col">INSTAWEATHER</div>
+        <div className="col h3">INSTAWEATHER</div>
         <div className="col">
-          <div className="row">
+          <div className="row w-50 m-auto">
             <div
               className={
                 "col" + (tempType == "c" ? " active bg-secondary" : "")
@@ -172,3 +130,28 @@ export default function Skeleton() {
     </div>
   );
 }
+
+function dateFunc(date) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const d = new Date(date);
+  return monthNames[d.getMonth()] + " " + d.getDate() + " " + d.getFullYear();
+}
+
+const celsiusToFahrenheit = (celsius) => Math.round((celsius * 9) / 5 + 32);
+
+const fahrenheitToCelsius = (fahrenheit) =>
+  Math.round(((fahrenheit - 32) * 5) / 9);
