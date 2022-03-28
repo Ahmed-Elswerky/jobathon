@@ -137,10 +137,10 @@ export default function Skeleton() {
       <div className="row">
         <div className="col h3">INSTAWEATHER</div>
         <div className="col">
-          <div className="row w-50 m-auto">
+          <div className="row w-50 m-auto" style={{maxWidth:'10rem'}}>
             <div
               className={
-                "col" + (tempType == "c" ? " active bg-secondary" : "")
+                "col" + (tempType == "c" ? " active bg-secondary border-end" : "")
               }
               onClick={() => setTempType("c")}
             >
@@ -148,7 +148,7 @@ export default function Skeleton() {
             </div>
             <div
               className={
-                "col" + (tempType == "f" ? " active bg-secondary" : "")
+                "col" + (tempType == "f" ? " active bg-secondary  border-start" : "")
               }
               onClick={() => setTempType("f")}
             >
@@ -192,6 +192,7 @@ export default function Skeleton() {
             Daily
           </div>
         </div>
+        <hr className="mt-0"/>
         <div className="row">
           <div>
             <ListItems data={listType == "hourly" ? hourly : daily} />
